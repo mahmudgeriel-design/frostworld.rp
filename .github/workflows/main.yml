@@ -1,4 +1,4 @@
-name: Build VolcanoEvent Plugin (Fixed API Download)
+name: Build VolcanoEvent Plugin (Robust Build)
 
 on:
   push:
@@ -18,15 +18,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Download Bukkit 1.16.5 (Maven Central)
+      - name: Download Bukkit 1.16.5 (with validation)
         run: |
-          wget https://repo1.maven.org/maven2/org/bukkit/bukkit/1.16.5-R0.1-SNAPSHOT/bukkit-1.16.5-R0.1-SNAPSHOT.jar -O bukkit.jar || \
-          echo "Warning: Bukkit 1.16.5 not found, build may fail"
+          wget https://repo1.maven.org/maven2/org/bukkit/bukkit/1.16.5-R0.1-SNAPSHOT/bukkit-1.16.5-R0.1-SNAPSHOT.jar -O bukkit.jar
+          if [ ! -s bukkit.jar ]; then
+            echo "ERROR: Failed to download Bukkit API. File is empty or missing."
+            exit 1
+          fi
+          echo "Bukkit API downloaded successfully, size: $(ls -lh bukkit.jar)"
+
+      - name: Create output directory
+        run: mkdir -p bin
 
       - name: Compile plugin (Java 8 compatibility)
         run: |
-          mkdir -p bin
           javac -d bin -sourcepath src -cp bukkit.jar -source 1.8 -target 1.8 src/com/example/volcanoevent/*.java
+          if [ $? -ne 0 ]; then
+            echo "Compilation failed. Check your Java code for errors."
+            exit 1
+          fi
 
       - name: Create JAR file
         run: jar cvfm VolcanoEvent.jar plugin.yml -C bin .
