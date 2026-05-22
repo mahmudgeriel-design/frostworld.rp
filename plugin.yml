@@ -1,0 +1,17 @@
+name: VolcanoEvent
+version: 1.0
+main: com.example.volcanoevent.VolcanoEvent
+api-version: 1.16
+author: YourName
+description: Ивент с вулканом и настройкой редкостей через GUI
+
+commands:
+  vulcan:
+    description: Управление ивентом «Вулкан»
+    usage: /<command> [add|start|stop|reload] [rarity]
+    permission: vulcan.admin
+
+permissions:
+  vulcan.admin:
+    description: Права администратора для управления вулканом
+    default: op
