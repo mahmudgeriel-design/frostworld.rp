@@ -1,4 +1,4 @@
-name: Build VolcanoEvent Plugin (Using Paper API)
+name: Build VolcanoEvent Plugin (Using BuildTools)
 
 on:
   push:
@@ -18,14 +18,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Download Paper API for 1.16.5
+      - name: Install Git and Generate Bukkit API
         run: |
-          wget https://repo.papermc.io/repository/maven-public/io/papermc/paper/paper-api/1.16.5-R0.1-20201002.1/paper-api-1.16.5-R0.1-20201002.1.jar -O bukkit.jar
+          sudo apt-get update && sudo apt-get install -y git
+          git clone https://github.com/SpigotMC/BuildTools.git
+          cd BuildTools
+          java -jar BuildTools.jar --rev 1.16.5
+          cp Bukkit/target/bukkit-1.16.5.jar ../bukkit.jar
+          cd ..
           if [ ! -s bukkit.jar ]; then
-            echo "ERROR: Failed to download Paper API. File is empty or missing."
+            echo "ERROR: Failed to generate Bukkit API with BuildTools"
             exit 1
           fi
-          echo "Paper API downloaded successfully, size: $(ls -lh bukkit.jar)"
+          echo "Bukkit API generated successfully, size: $(ls -lh bukkit.jar)"
 
       - name: Create output directory
         run: mkdir -p bin
