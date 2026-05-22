@@ -1,4 +1,4 @@
-name: Build VolcanoEvent Plugin (Reliable Method)
+name: Build VolcanoEvent Plugin (Local Bukkit)
 
 on:
   push:
@@ -18,19 +18,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Download Bukkit API 1.16.5 (from Maven Central)
+      - name: Use local Bukkit API
         run: |
-          wget https://repo1.maven.org/maven2/org/bukkit/bukkit/1.16.5/bukkit-1.16.5.jar -O bukkit.jar
-          if [ $? -ne 0 ] || [ ! -s bukkit.jar ]; then
-            echo "WARNING: Bukkit 1.16.5 not found in Maven Central. Trying alternative source..."
-            # Альтернативный источник — Paper API (если Maven Central не помог)
-            wget https://repo.papermc.io/repository/maven-public/io/papermc/paper/paper-api/1.16.5-R0.1-SNAPSHOT/paper-api-1.16.5-R0.1-SNAPSHOT.jar -O bukkit.jar
-            if [ $? -ne 0 ] || [ ! -s bukkit.jar ]; then
-              echo "ERROR: Failed to download Bukkit/Paper API"
-              exit 1
-            fi
+          # Проверяем, существует ли локальный файл bukkit.jar
+          if [ ! -f lib/bukkit-1.16.5.jar ]; then
+            echo "ERROR: Local Bukkit API file not found. Please upload bukkit-1.16.5.jar to lib/ folder"
+            exit 1
           fi
-          echo "Bukkit API downloaded successfully, size: $(ls -lh bukkit.jar)"
+          cp lib/bukkit-1.16.5.jar bukkit.jar
+          echo "Local Bukkit API copied successfully, size: $(ls -lh bukkit.jar)"
 
       - name: Create output directory
         run: mkdir -p bin
