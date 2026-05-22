@@ -1,4 +1,4 @@
-name: Build VolcanoEvent Plugin (Java 17 with fallback)
+name: Build VolcanoEvent Plugin (Fixed API Download)
 
 on:
   push:
@@ -18,14 +18,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Download Bukkit/Spigot API with fallback
+      - name: Download Bukkit 1.16.5 (Maven Central)
         run: |
-          if wget -q --spider https://hub.spigotmc.org/nexus/content/repositories/snapshots/org/bukkit/bukkit/1.16.5-R0.1-SNAPSHOT/bukkit-1.16.5-R0.1-SNAPSHOT.jar; then
-            wget https://hub.spigotmc.org/nexus/content/repositories/snapshots/org/bukkit/bukkit/1.16.5-R0.1-SNAPSHOT/bukkit-1.16.5-R0.1-SNAPSHOT.jar -O bukkit.jar
-          else
-            echo "Bukkit 1.16.5 snapshot not found, using Spigot API instead"
-            wget https://hub.spigotmc.org/jenkins/job/Spigot-API/1303/artifact/target/spigot-api-1.16.5-R0.1-SNAPSHOT-shaded.jar -O bukkit.jar
-          fi
+          wget https://repo1.maven.org/maven2/org/bukkit/bukkit/1.16.5-R0.1-SNAPSHOT/bukkit-1.16.5-R0.1-SNAPSHOT.jar -O bukkit.jar || \
+          echo "Warning: Bukkit 1.16.5 not found, build may fail"
 
       - name: Compile plugin (Java 8 compatibility)
         run: |
