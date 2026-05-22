@@ -1,4 +1,4 @@
-name: Build VolcanoEvent Plugin (Using BuildTools with SSH)
+name: Build VolcanoEvent Plugin
 
 on:
   push:
@@ -18,24 +18,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Generate Bukkit API with BuildTools
+      - name: Generate Bukkit API with BuildTools (HTTPS)
         run: |
-          # Добавляем GitHub в известные хосты
-          mkdir -p ~/.ssh
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-          # Клонируем BuildTools через SSH
-          git clone git@github.com:SpigotMC/BuildTools.git
+          git clone https://github.com/SpigotMC/BuildTools.git
           cd BuildTools
-
-          # Собираем Bukkit API для 1.16.5
           java -jar BuildTools.jar --rev 1.16.5
           cp Bukkit/target/bukkit-1.16.5.jar ../bukkit.jar
           cd ..
-
-          # Проверяем успешность генерации
           if [ ! -s bukkit.jar ]; then
-            echo "ERROR: Failed to generate Bukkit API with BuildTools"
+            echo "ERROR: BuildTools failed to generate Bukkit API"
             exit 1
           fi
           echo "Bukkit API generated successfully, size: $(ls -lh bukkit.jar)"
