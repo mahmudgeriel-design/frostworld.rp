@@ -28,10 +28,8 @@ jobs:
         run: |
           git clone https://github.com/SpigotMC/BuildTools.git
           cd BuildTools
-          # Accept EULA automatically
           echo "eula=true" > eula.txt
           java -jar BuildTools.jar --rev 1.16.5
-          # Copy generated Spigot JAR to workspace
           cp Spigot/target/spigot-*.jar ../bukkit.jar
           cd ..
           if [ ! -s bukkit.jar ]; then
