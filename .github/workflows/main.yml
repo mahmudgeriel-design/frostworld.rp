@@ -1,4 +1,4 @@
-name: Build VolcanoEvent Plugin (Local Bukkit)
+name: Build VolcanoEvent Plugin (Auto‑Build Spigot)
 
 on:
   push:
@@ -18,15 +18,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Use local Bukkit API
+      - name: Install Git LFS (required for BuildTools)
         run: |
-          # Проверяем, существует ли локальный файл bukkit.jar
-          if [ ! -f lib/bukkit-1.16.5.jar ]; then
-            echo "ERROR: Local Bukkit API file not found. Please upload bukkit-1.16.5.jar to lib/ folder"
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+
+      - name: Clone BuildTools and generate Spigot 1.16.5
+        run: |
+          git clone https://github.com/SpigotMC/BuildTools.git
+          cd BuildTools
+          # Accept EULA automatically
+          echo "eula=true" > eula.txt
+          java -jar BuildTools.jar --rev 1.16.5
+          # Copy generated Spigot JAR to workspace
+          cp Spigot/target/spigot-*.jar ../bukkit.jar
+          cd ..
+          if [ ! -s bukkit.jar ]; then
+            echo "ERROR: Failed to generate Spigot JAR"
             exit 1
           fi
-          cp lib/bukkit-1.16.5.jar bukkit.jar
-          echo "Local Bukkit API copied successfully, size: $(ls -lh bukkit.jar)"
+          echo "Spigot JAR generated successfully, size: $(ls -lh bukkit.jar)"
 
       - name: Create output directory
         run: mkdir -p bin
